@@ -25,5 +25,9 @@ app.get('/', function (request, response) {
 var port = process.env.PORT || 5000;
 
 app.listen(port, function () {
-	console.log('Listening on ' + port);
+	log('Listening on ' + port);
 });
+
+function log(mes) {
+    process.stdout.write(mes + '\n');
+}
