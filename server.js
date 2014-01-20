@@ -21,6 +21,10 @@ app.get('/', function (request, response) {
 	response.render('index.html');
 });
 
+app.get('/webPart',function(request,response){
+	response.render('webpart.html');
+});
+
 
 var port = process.env.PORT || 5000;
 
