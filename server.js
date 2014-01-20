@@ -16,13 +16,14 @@ app.configure(function () {
 	//app.engine('html');
 });
 
+app.set("view options", {layout: false});
 
 app.get('/', function (request, response) {
-	response.render('index.html');
+	response.sendfile('app/index.html');
 });
 
 app.get('/webPart',function(request,response){
-	response.render('webpart.html');
+	response.sendfile('app/webpart.html');
 });
 
 
