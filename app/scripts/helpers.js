@@ -1,7 +1,7 @@
 (function (window) {
     "use strict";
-    var appUrl, hostUrl, executor, context, factory,ind;
-    
+    var appUrl, hostUrl, executor, context, factory, ind;
+
     function getQueryStringParameter(param) {
         var params = document.URL.split("?")[1].split("&"),
             i, singleParam;
@@ -35,7 +35,7 @@
         return defer.promise();
     }
 
-    function deleteAsync(url,etag) {
+    function deleteAsync(url, etag) {
         var defer = new $.Deferred();
 
         executor.executeAsync({
@@ -57,7 +57,7 @@
         return defer.promise();
     }
 
-    function updateAsync(url,data) {
+    function updateAsync(url, data) {
         var defer = new $.Deferred();
 
         executor.executeAsync({
@@ -68,7 +68,7 @@
                 "Accept": "application/json;odata=verbose",
                 "Content-Type": "application/json;odata=verbose",
                 "X-HTTP-Method": "MERGE",
-                "If-Match":data.__metadata.etag
+                "If-Match": data.__metadata.etag
             },
             success: function (data) {
                 defer.resolve(data);
@@ -88,7 +88,7 @@
         executor.executeAsync({
             url: url,
             method: "POST",
-            body:JSON.stringify(data),
+            body: JSON.stringify(data),
             headers: {
                 Accept: "application/json;odata=verbose",
                 "Content-Type": "application/json;odata=verbose"
@@ -115,11 +115,11 @@
     context = SP.ClientContext.get_current();
     factory = SP.ProxyWebRequestExecutorFactory(appUrl);
 
-    ind =  {
+    ind = {
         rest: {
             getHostLists: function (query) {
                 var url = appUrl + "/_api/SP.AppContextSite(@target)/web/lists?" + query + "&@target='" + hostUrl + "'";
-               
+
                 return getAsync(url);
             },
             getHostListByTitle: function (listTitle, query) {
@@ -143,23 +143,23 @@
 
                 data = {
                     "__metadata": {
-                        type:"SP.List"
+                        type: "SP.List"
                     },
-                    BaseTemplate:list.Template,
-                    Title:list.Title
+                    BaseTemplate: list.Template,
+                    Title: list.Title
                 };
 
-                return createAsync(url,data);
+                return createAsync(url, data);
             },
             addHostListItem: function (listTitle, item) {
                 var url = appUrl + "/_api/SP.AppContextSite(@target)/web/lists/getByTitle('" + listTitle + "')/Items?&@target='" + hostUrl + "'";
 
                 return createAsync(url, item);
             },
-            deleteHostListItem: function (listTitle,itemId,etag) {
+            deleteHostListItem: function (listTitle, itemId, etag) {
                 var url = appUrl + "/_api/SP.AppContextSite(@target)/web/lists/getByTitle('" + listTitle + "')/Items(" + itemId + ")?&@target='" + hostUrl + "'";
 
-                return deleteAsync(url,etag);
+                return deleteAsync(url, etag);
             },
             updateHostListItem: function (listTitle, item) {
                 var url = appUrl + "/_api/SP.AppContextSite(@target)/web/lists/getByTitle('" + listTitle + "')/Items(" + item.Id + ")?&@target='" + hostUrl + "'";
@@ -175,7 +175,7 @@
         csom: {
             createHostList: function (list) {
                 var appContextSite,
-                    web,listCreationInfo,newList;
+                    web, listCreationInfo, newList;
 
                 context.set_webRequestExecutorFactory(factory);
                 appContextSite = new SP.AppContextSite(context, hostUrl);
@@ -187,7 +187,7 @@
                 listCreationInfo.set_templateType(list.Type);
 
                 newList = web.get_lists().add(listCreationInfo);
-               
+
                 context.load(newList);
                 context.executeQueryAsync(success, fail);
 
@@ -233,6 +233,9 @@
                         '\n' + args.get_stackTrace());
                 }
             }
+        },
+        getHostUrl: function () {
+            return hostUrl;
         }
     };
 

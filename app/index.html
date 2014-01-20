@@ -19,16 +19,27 @@
 	<script type="text/javascript" src="scripts/sharepoint/sp.core.js" ></script>
 	<script type="text/javascript" src="scripts/sharepoint/SP.UI.Dialog.js" ></script>
 	<script type="text/javascript" src="scripts/sharepoint/sp.requestexecutor.js" ></script>
+	<script type="text/javascript" src="scripts/sharepoint/SP.UI.Controls.js" ></script>
 	<script type="text/javascript" src="scripts/helpers.js" ></script>
+	<script type="text/javascript" src="scripts/chromeLoader.js" ></script>
 	<script type="text/javascript" src="scripts/App.js" ></script>
 	
 </head>
 <body>
-	<div ng-app="myApp">
-        <div>
-            <a href="#/lessons">Lessons</a>
-        </div>
-        <div ng-view=""></div>
+	<!-- Chrome control placeholder -->
+    <div id="chrome_ctrl_placeholder"></div>
+
+    <!-- The chrome control also makes the SharePoint
+          Website stylesheet available to your page -->
+    <h1 class="ms-accentText">Main content</h1>
+    <h2 class="ms-accentText">The chrome control</h2>
+    <div id="MainContent">
+		<div ng-app="myApp">
+    	    <div>
+    	        <a href="#/lessons">Lessons</a>
+    	    </div>
+    	    <div ng-view=""></div>
+    	</div>
     </div>
     
 </body>
