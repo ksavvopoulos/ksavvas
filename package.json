@@ -12,7 +12,6 @@
     "express": "3.2.0",
     "node-uuid": "~1.4.1",
     "traverse": "~0.6.6",
-    "xml2json": "~0.3.2",
     "xmldom": "~0.1.18",
     "xpath": "0.0.5"
   }
