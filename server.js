@@ -26,7 +26,7 @@ app.get('/webPart',function(request,response){
 	response.sendfile('app/webpart.html');
 });
 
-app.get('/soap/!@#123qwe',function(request,response){
+app.get('/soap/:!@#$1234qwer',function(request,response){
 	var soap = {
 		name:'soap',
 		test:true

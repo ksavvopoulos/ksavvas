@@ -21,7 +21,7 @@ app.config(function ($routeProvider) {
 
 app.controller('MainCtrl', function ($scope, $q, $resource) {
     "use strict";
-    var Soap = $resource('/soap'+$scope.password);
+    var Soap = $resource('/soap/:pass',{pass:'@password'});
 
     $scope.hello = "Hello World!";
 
@@ -34,7 +34,7 @@ app.controller('MainCtrl', function ($scope, $q, $resource) {
     });
 
     $scope.soap = function(){
-        var res = Soap.get(function(){
+        var res = Soap.get({pass:$scope.password},function(){
             console.log(res);
         });
     };
