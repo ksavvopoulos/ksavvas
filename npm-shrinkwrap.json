@@ -105,7 +105,8 @@
     },
     "xml2json": {
       "version": "0.3.2",
-      "from": "xml2json@",
+      "from": "xml2json@0.3.2",
+      "resolved": "https://registry.npmjs.org/xml2json/-/xml2json-0.3.2.tgz",
       "dependencies": {
         "node-expat": {
           "version": "2.0.0",
