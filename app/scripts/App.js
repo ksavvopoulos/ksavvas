@@ -21,7 +21,7 @@ app.config(function ($routeProvider) {
 
 app.controller('MainCtrl', function ($scope, $q, $resource) {
     "use strict";
-    var Soap = $resource('/soap');
+    var Soap = $resource('/soap'+$scope.password);
 
     $scope.hello = "Hello World!";
 
