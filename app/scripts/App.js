@@ -1,40 +1,47 @@
-﻿var app = angular.module('myApp', ['ngRoute']);
+﻿var app = angular.module('myApp', ['ngRoute', 'ngResource']);
 
 app.config(function ($routeProvider) {
     "use strict";
 
     $routeProvider.
-        when('/', {
-            templateUrl: 'views/main.html',
-            controller: 'MainCtrl'
-        }).
-        when('/lessons', {
-            templateUrl: 'views/lessons.html',
-            controller: "lessonsCtrl"
-        }).
-        when('/addItem', {
-            templateUrl: 'views/addItem.html'
-        });
-        
-});
-
-
-app.controller('MainCtrl', function ($scope,$q) {
-    "use strict";
-    
-    $scope.hello = "Hello World!";
-    
-    $q.when(ind.rest.getHostLists('')).then(function (data) {
-        var res = JSON.parse(data.body);
-
-        console.log(res);
-        
-        $scope.items = res.d.results;
+    when('/', {
+        templateUrl: 'views/main.html',
+        controller: 'MainCtrl'
+    }).
+    when('/lessons', {
+        templateUrl: 'views/lessons.html',
+        controller: "lessonsCtrl"
+    }).
+    when('/addItem', {
+        templateUrl: 'views/addItem.html'
     });
 
 });
 
-app.controller('lessonsCtrl', function ($scope,$q) {
+
+app.controller('MainCtrl', function ($scope, $q, $resource) {
+    "use strict";
+    var Soap = $resource('/soap');
+
+    $scope.hello = "Hello World!";
+
+    $q.when(ind.rest.getHostLists('')).then(function (data) {
+        var res = JSON.parse(data.body);
+
+        console.log(res);
+
+        $scope.items = res.d.results;
+    });
+
+    $scope.soap = function(){
+        var res = Soap.get(function(){
+            console.log(res);
+        });
+    };
+
+});
+
+app.controller('lessonsCtrl', function ($scope, $q) {
     "use strict";
 
     $scope.lessons = "Just a Lessons List";
@@ -50,32 +57,32 @@ app.controller('lessonsCtrl', function ($scope,$q) {
     }
 
     $scope.updateList = function () {
-        $q.when(ind.rest.getHostListByTitle('Lessons1','')).
-            then(function (data) {
-                var res = JSON.parse(data.body),
-                    listData = {
-                        Title: "Lessons",
-                        __metadata:res.d.__metadata
-                    };
-                console.log(res);
-                return $q.when(ind.rest.updateHostList('Lessons1',listData));
-            }).
-            then(function () {
-                console.log("List Updated");
-            });
+        $q.when(ind.rest.getHostListByTitle('Lessons1', '')).
+        then(function (data) {
+            var res = JSON.parse(data.body),
+                listData = {
+                    Title: "Lessons",
+                    __metadata: res.d.__metadata
+                };
+            console.log(res);
+            return $q.when(ind.rest.updateHostList('Lessons1', listData));
+        }).
+        then(function () {
+            console.log("List Updated");
+        });
     };
-    
+
     $scope.delete = function (index, item) {
-        $q.when(ind.rest.deleteHostListItem('Lessons', item.Id,item.__metadata.etag)).
-            then(function () {
-                $scope.items.splice(index, 1);
-            },function (error) {
-                console.log(error);
-            });
+        $q.when(ind.rest.deleteHostListItem('Lessons', item.Id, item.__metadata.etag)).
+        then(function () {
+            $scope.items.splice(index, 1);
+        }, function (error) {
+            console.log(error);
+        });
     };
 
     $scope.update = function (item) {
-        
+
         var upItem = {
             Title: "new " + item.Title,
             Id: item.Id,
@@ -93,28 +100,28 @@ app.controller('lessonsCtrl', function ($scope,$q) {
     getLessons();
 });
 
-app.controller('addItem', function ($scope, $location,$q) {
+app.controller('addItem', function ($scope, $location, $q) {
     "use strict";
 
     $scope.add = function () {
         var item = {
             Title: $scope.Title,
-            "__metadata":{
+            "__metadata": {
                 type: "SP.Data.LessonsListItem"
             }
         };
         console.log(item);
-        
+
         $q.when(ind.rest.addHostListItem('Lessons', item)).
-            then(function (data) {
-                console.log(data);
-               
-                $location.path('/lessons');
-                
-                console.log($location.path());
-            },function (error) {
-                console.log(error);
-            });
+        then(function (data) {
+            console.log(data);
+
+            $location.path('/lessons');
+
+            console.log($location.path());
+        }, function (error) {
+            console.log(error);
+        });
     };
 });
 
@@ -136,9 +143,9 @@ app.controller('addItem', function ($scope, $location,$q) {
 //    lists = appContextSite.get_web().get_lists();
 
 //    context.loadQuery(lists);
-   
+
 //    context.executeQueryAsync(success, fail);
-   
+
 
 //    function success() {
 //        var i, len, current, lenum;

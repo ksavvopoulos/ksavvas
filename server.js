@@ -26,6 +26,15 @@ app.get('/webPart',function(request,response){
 	response.sendfile('app/webpart.html');
 });
 
+app.get('/soap',function(request,response){
+	var soap = {
+		name:'soap',
+		test:true
+	};
+
+	response.send(soap);
+});
+
 
 var port = process.env.PORT || 5000;
 
