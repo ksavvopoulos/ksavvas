@@ -1,6 +1,7 @@
-var express = require('express');
+var express = require('express'),
+	register = require('./regDev.js'),
+	app = express();
 
-var app = express();
 app.use(express.logger());
 
 // Configuration
@@ -27,12 +28,15 @@ app.get('/webPart',function(request,response){
 });
 
 app.get('/soap/ksavvas13',function(request,response){
-	var soap = {
-		name:'soap',
-		test:true
-	};
-
-	response.send(soap);
+	register.registerDevice(function (device) {
+		register.getToken(device, function (cipherValue) {
+			register.getTokenLiveId(cipherValue, function (options) {
+				register.retrieveMultiple(options, function (results) {
+					response.send(results);
+				});
+			});
+		});
+	});
 });
 
 
