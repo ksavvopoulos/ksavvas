@@ -1,4 +1,4 @@
-var register = (function () {
+var register = (function() {
 	var uuid = require('node-uuid'),
 		https = require('https'),
 		fs = require('fs'),
@@ -31,7 +31,7 @@ var register = (function () {
 	function renameKey(objInd, prefixes) {
 		var rk = objInd;
 
-		prefixes.forEach(function (p) {
+		prefixes.forEach(function(p) {
 			if (objInd.indexOf(p) === 0) {
 				rk = objInd.replace(p, '');
 			}
@@ -78,15 +78,15 @@ var register = (function () {
 
 		requestOptions.agent = new https.Agent(requestOptions);
 
-		req = https.request(requestOptions, function (res) {
+		req = https.request(requestOptions, function(res) {
 			var xml = '';
 			res.setEncoding('utf8');
 
-			res.on('data', function (chunk) {
+			res.on('data', function(chunk) {
 				xml += chunk;
 			});
 
-			res.on('end', function () {
+			res.on('end', function() {
 				var resXml = domParser.parseFromString(xml),
 					fault = xpath.select(faultTextXpath, resXml),
 					data, jsondata, data_no_ns, prefixes, pos, k, key;
@@ -99,32 +99,31 @@ var register = (function () {
 
 
 				jsondata = JSON.parse(parser.toJson(xml));
-				
+
 				cb(normalizeData(jsondata));
 			});
 		});
 
-		req.on('error', function (err) {
+		req.on('error', function(err) {
 			log(err);
 		});
 
 		req.end(soapPostMessage);
-
 	}
 
 	function normalizeData(data) {
 		var leaves = [],
 			results = [];
 
-		traverse(data).forEach(function (x) {
+		traverse(data).forEach(function(x) {
 			if (typeof this.key !== "undefined" && this.key.indexOf('KeyValuePairOfstringanyType') !== -1) {
 				leaves.push(x);
 			}
 		});
 
-		leaves.forEach(function (leave) {
+		leaves.forEach(function(leave) {
 			var obj = {};
-			leave.forEach(function (l) {
+			leave.forEach(function(l) {
 				var key = l['c:key'],
 					value = l['c:value'];
 
@@ -136,8 +135,12 @@ var register = (function () {
 		return results;
 	}
 
+	function log(mes) {
+		process.stdout.write(mes + '\n');
+	}
+
 	return {
-		registerDevice: function (cb) {
+		registerDevice: function(cb) {
 			var options, req,
 				username = genRandom.generateRandom(24, 'aA#'),
 				password = genRandom.generateRandom(24, 'aA#'),
@@ -162,16 +165,16 @@ var register = (function () {
 
 			options.agent = new https.Agent(options);
 
-			req = https.request(options, function (res) {
+			req = https.request(options, function(res) {
 				var xml = '';
 				res.setEncoding('utf8');
 
-				res.on('data', function (chunk) {
+				res.on('data', function(chunk) {
 					xml += chunk;
 					log(chunk);
 				});
 
-				res.on('end', function (d) {
+				res.on('end', function(d) {
 					var resXml = domParser.parseFromString(xml),
 						fault = xpath.select(faultTextXpath, resXml),
 						puid, device;
@@ -199,11 +202,11 @@ var register = (function () {
 
 			req.end();
 
-			req.on('error', function (e) {
+			req.on('error', function(e) {
 				console.error(e);
 			});
 		},
-		getToken: function (device, cb) {
+		getToken: function(device, cb) {
 			var timeCreated = new Date(),
 				requestOptions, req,
 				timeExpires = new Date(timeCreated.getTime() + 5 * 60 * 1000),
@@ -226,19 +229,19 @@ var register = (function () {
 				}
 			};
 
-			req = https.request(requestOptions, function (res) {
+			req = https.request(requestOptions, function(res) {
 				var xml = '',
 					resXml, fault,
 					cipherValue, cipher;
 
 				res.setEncoding('utf8');
 
-				res.on('data', function (chunk) {
+				res.on('data', function(chunk) {
 					xml += chunk;
 					log(chunk);
 				});
 
-				res.on('end', function () {
+				res.on('end', function() {
 					resXml = domParser.parseFromString(xml);
 					fault = xpath.select(faultTextXpath, resXml);
 
@@ -259,11 +262,11 @@ var register = (function () {
 
 			req.end(authRequestDeviceTokenMessage);
 
-			req.on('error', function (e) {
+			req.on('error', function(e) {
 				console.error(e);
 			});
 		},
-		getTokenLiveId: function (cipherValue, cb) {
+		getTokenLiveId: function(cipherValue, cb) {
 			var timeCreated = new Date(),
 				requestOptions, req,
 				timeExpires = new Date(timeCreated.getTime() + 5 * 60 * 1000),
@@ -288,16 +291,16 @@ var register = (function () {
 				}
 			};
 
-			req = https.request(requestOptions, function (res) {
+			req = https.request(requestOptions, function(res) {
 				var xml = '';
 
 				res.setEncoding('utf8');
 
-				res.on('data', function (chunk) {
+				res.on('data', function(chunk) {
 					xml += chunk;
 				});
 
-				res.on('end', function () {
+				res.on('end', function() {
 					var resXml = domParser.parseFromString(xml),
 						fault = xpath.select(faultTextXpath, resXml),
 						fullMessage, faultDetailsXpath, faultDetails,
@@ -341,18 +344,18 @@ var register = (function () {
 				});
 			});
 
-			req.on('error', function (err) {
+			req.on('error', function(err) {
 				log(err);
 			});
 
 			req.end(authRequestSTSTokenMessage);
 		},
-		retrieveMultiple: function (options, cb) {
+		retrieveMultiple: function(options, cb) {
 			var apiRetrieveMultipleMessage = fs.readFileSync("xml/api_retrievemultiple.xml").toString();
 
 			executePost(options, "RetrieveMultiple", apiRetrieveMultipleMessage, serializer.toXmlRetrieveMultiple(options), cb);
 		},
-		retrieveAllEntities: function (options) {
+		retrieveAllEntities: function(options) {
 			var apiRetrieveAllEntittiesMessage = fs.readFileSync("xml/api_RetrieveAllEntities.xml").toString();
 
 			return executePost(options, "Execute", apiRetrieveAllEntittiesMessage, serializer.toXmlRetrieveAllEntities(options));
