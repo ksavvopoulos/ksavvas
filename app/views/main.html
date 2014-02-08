@@ -6,7 +6,20 @@
         </ul>
      </div>
      <div>
-     	<div><input type="password" ng-model="password"/> </div>
-     	<button type="button" ng-click="soap()">soap</button>
+        <div ng-show="!isLogged">
+            Username<input type="text" ng-model="username"/>
+            Password<input type="password" ng-model="password"/>
+            <button type="button" ng-click="login()">Login</button>    
+        </div>
+     	<div ng-show="isLogged">
+            Entity<input type="text" ng-model="entity" />
+            Attribute <input type="text" ng-model="attribute" />
+            <button type="button" ng-click="soap()">soap</button>
+        </div>
+     </div>
+     <div ng-show="showSoap">
+         <ul>
+            <li ng-repeat="invoice in invoices">{{invoice[attribute.toLowerCase()].$t}}</li>
+        </ul>
      </div>
 </div>

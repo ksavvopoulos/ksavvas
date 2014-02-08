@@ -1,6 +1,6 @@
 ﻿var app = angular.module('myApp', ['ngRoute', 'ngResource']);
 
-app.config(function ($routeProvider) {
+app.config(function($routeProvider) {
     "use strict";
 
     $routeProvider.
@@ -19,13 +19,32 @@ app.config(function ($routeProvider) {
 });
 
 
-app.controller('MainCtrl', function ($scope, $q, $resource) {
+app.controller('MainCtrl', function($scope, $q, $resource) {
     "use strict";
-    var Soap = $resource('/soap/:pass',{pass:'@password'});
+    var Soap, User;
 
+    Soap = $resource('/soap/entity/:entity/attribute/:attribute', {
+        entity: '@entity',
+        attribute: '@attribute'
+    }, {
+        'get': {
+            method: 'GET',
+            isArray: true
+        }
+    });
+
+    User = $resource('/login/', {}, {
+        'save': {
+            method: "POST",
+            isArray: false
+        }
+    });
+
+    $scope.isLogged = false;
+    $scope.invoices = [];
     $scope.hello = "Hello World!";
 
-    $q.when(ind.rest.getHostLists('')).then(function (data) {
+    $q.when(ind.rest.getHostLists('')).then(function(data) {
         var res = JSON.parse(data.body);
 
         console.log(res);
@@ -33,22 +52,36 @@ app.controller('MainCtrl', function ($scope, $q, $resource) {
         $scope.items = res.d.results;
     });
 
-    $scope.soap = function(){
-        var res = Soap.get({pass:$scope.password},function(){
+    $scope.login = function() {
+        var post = User.save({}, {
+            username: $scope.username,
+            password: $scope.password
+        }, function() {
+            $scope.isLogged = post.logged;
+        });
+    };
+
+    $scope.soap = function() {
+        var res = Soap.get({
+            entity: $scope.entity,
+            attribute: $scope.attribute
+        }, function() {
+            $scope.showSoap = true;
             console.log(res);
+            $scope.invoices = res;
         });
     };
 
 });
 
-app.controller('lessonsCtrl', function ($scope, $q) {
+app.controller('lessonsCtrl', function($scope, $q) {
     "use strict";
 
     $scope.lessons = "Just a Lessons List";
 
     function getLessons() {
         $scope.items = [];
-        $q.when(ind.rest.getHostListItems('Lessons', '$select=Title,Id')).then(function (data) {
+        $q.when(ind.rest.getHostListItems('Lessons', '$select=Title,Id')).then(function(data) {
             var res = JSON.parse(data.body);
             console.log(res);
 
@@ -56,9 +89,9 @@ app.controller('lessonsCtrl', function ($scope, $q) {
         });
     }
 
-    $scope.updateList = function () {
+    $scope.updateList = function() {
         $q.when(ind.rest.getHostListByTitle('Lessons1', '')).
-        then(function (data) {
+        then(function(data) {
             var res = JSON.parse(data.body),
                 listData = {
                     Title: "Lessons",
@@ -67,21 +100,21 @@ app.controller('lessonsCtrl', function ($scope, $q) {
             console.log(res);
             return $q.when(ind.rest.updateHostList('Lessons1', listData));
         }).
-        then(function () {
+        then(function() {
             console.log("List Updated");
         });
     };
 
-    $scope.delete = function (index, item) {
+    $scope.delete = function(index, item) {
         $q.when(ind.rest.deleteHostListItem('Lessons', item.Id, item.__metadata.etag)).
-        then(function () {
+        then(function() {
             $scope.items.splice(index, 1);
-        }, function (error) {
+        }, function(error) {
             console.log(error);
         });
     };
 
-    $scope.update = function (item) {
+    $scope.update = function(item) {
 
         var upItem = {
             Title: "new " + item.Title,
@@ -89,10 +122,10 @@ app.controller('lessonsCtrl', function ($scope, $q) {
             __metadata: item.__metadata
         };
 
-        $q.when(ind.rest.updateHostListItem("Lessons", upItem)).then(function (data) {
+        $q.when(ind.rest.updateHostListItem("Lessons", upItem)).then(function(data) {
             console.log('Item Updated' + data);
             getLessons();
-        }, function (error) {
+        }, function(error) {
             console.log(error);
         });
     };
@@ -100,10 +133,10 @@ app.controller('lessonsCtrl', function ($scope, $q) {
     getLessons();
 });
 
-app.controller('addItem', function ($scope, $location, $q) {
+app.controller('addItem', function($scope, $location, $q) {
     "use strict";
 
-    $scope.add = function () {
+    $scope.add = function() {
         var item = {
             Title: $scope.Title,
             "__metadata": {
@@ -113,13 +146,13 @@ app.controller('addItem', function ($scope, $location, $q) {
         console.log(item);
 
         $q.when(ind.rest.addHostListItem('Lessons', item)).
-        then(function (data) {
+        then(function(data) {
             console.log(data);
 
             $location.path('/lessons');
 
             console.log($location.path());
-        }, function (error) {
+        }, function(error) {
             console.log(error);
         });
     };
